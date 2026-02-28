@@ -11,9 +11,9 @@ type productRepository struct {
 }
 
 type ProductRepository interface {
-	Create(note *models.Note) (*models.Note, error)
-	List(UId string) ([]*models.Note, error)
-	Update(req *models.NoteUpdateRequest) (*models.Note, error)
+	Create(note *models.Product) (*models.Product, error)
+	List(UId string) ([]*models.Product, error)
+	Update(req *models.NoteUpdateRequest) (*models.Product, error)
 	Delete(Id string) (string, error)
 }
 
@@ -22,7 +22,7 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 }
 
 // Create implements [NoteRepository].
-func (p productRepository) Create(note *models.Note) (*models.Note, error) {
+func (p productRepository) Create(note *models.Product) (*models.Product, error) {
 
 	if err := p.db.Create(note).Error; err != nil {
 		return nil, err
@@ -32,8 +32,8 @@ func (p productRepository) Create(note *models.Note) (*models.Note, error) {
 }
 
 // List implements [NoteRepository].
-func (p productRepository) List(UId string) ([]*models.Note, error) {
-	var notes []*models.Note
+func (p productRepository) List(UId string) ([]*models.Product, error) {
+	var notes []*models.Product
 
 	if err := p.db.Where("uid = ?", UId).Find(&notes).Error; err != nil {
 		return nil, err
@@ -47,6 +47,6 @@ func (p productRepository) Delete(Id string) (string, error) {
 }
 
 // Update implements [NoteRepository].
-func (p productRepository) Update(req *models.NoteUpdateRequest) (*models.Note, error) {
+func (p productRepository) Update(req *models.NoteUpdateRequest) (*models.Product, error) {
 	panic("unimplemented")
 }

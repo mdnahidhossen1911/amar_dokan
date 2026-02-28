@@ -28,7 +28,7 @@ type productcontroller struct {
 }
 
 func (p productcontroller) Create(c *gin.Context) {
-	var req models.NoteRequest
+	var req models.ProductRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, utils.ApiResponse{
 			Success: false,

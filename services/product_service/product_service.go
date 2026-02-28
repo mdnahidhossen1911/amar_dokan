@@ -7,27 +7,27 @@ import (
 )
 
 type ProductService interface {
-	Create(note *models.NoteRequest, token string) (*models.Note, error)
-	Get(token string) ([]*models.Note, error)
-	GetProfile(token string) (*models.Note, error)
-	Update(models.Note) (*models.Note, error)
+	Create(product *models.ProductRequest, token string) (*models.Product, error)
+	Get(token string) ([]*models.Product, error)
+	GetProfile(token string) (*models.Product, error)
+	Update(models.Product) (*models.Product, error)
 	Delete(id string) (string, error)
 }
 
-type noteService struct {
+type productService struct {
 	repo      repositories.ProductRepository
 	jwtSecret string
 }
 
 func NewProductService(key string, repo repositories.ProductRepository) ProductService {
-	return noteService{
+	return productService{
 		jwtSecret: key,
 		repo:      repo,
 	}
 }
 
 // Create implements [NoteService].
-func (p noteService) Create(note *models.NoteRequest, token string) (*models.Note, error) {
+func (p productService) Create(product *models.ProductRequest, token string) (*models.Product, error) {
 
 	payload, err := utils.DecodeJWT(token, p.jwtSecret)
 
@@ -35,18 +35,19 @@ func (p noteService) Create(note *models.NoteRequest, token string) (*models.Not
 		return nil, err
 	}
 
-	noteData := &models.Note{
+	noteData := &models.Product{
 		UID:   payload.Sub,
-		Title: note.Title,
-		Body:  note.Body,
+		Name: product.Name,
+		Description:  product.Description,
+		ImageUrl: product.ImageUrl,
+		Price: product.Price,
 	}
 
 	return p.repo.Create(noteData)
 
 }
 
-// Get implements [NoteService].
-func (p noteService) Get(token string) ([]*models.Note, error) {
+func (p productService) Get(token string) ([]*models.Product, error) {
 
 	payload, err := utils.DecodeJWT(token, p.jwtSecret)
 	if err != nil {
@@ -57,16 +58,16 @@ func (p noteService) Get(token string) ([]*models.Note, error) {
 }
 
 // Delete implements [NoteService].
-func (p noteService) Delete(id string) (string, error) {
+func (p productService) Delete(id string) (string, error) {
 	panic("unimplemented")
 }
 
 // GetProfile implements [NoteService].
-func (p noteService) GetProfile(token string) (*models.Note, error) {
+func (p productService) GetProfile(token string) (*models.Product, error) {
 	panic("unimplemented")
 }
 
 // Update implements [NoteService].
-func (p noteService) Update(models.Note) (*models.Note, error) {
+func (p productService) Update(models.Product) (*models.Product, error) {
 	panic("unimplemented")
 }
