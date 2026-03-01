@@ -12,7 +12,6 @@ import (
 type ProductController interface {
 	Create(c *gin.Context)
 	Get(c *gin.Context)
-	GetById(c *gin.Context)
 	Delete(c *gin.Context)
 	Update(c *gin.Context)
 }
@@ -57,7 +56,21 @@ func (p productcontroller) Create(c *gin.Context) {
 
 // Delete implements [NoteController].
 func (p productcontroller) Delete(c *gin.Context) {
-	panic("unimplemented")
+	id := c.Param("id")
+
+	message, err := p.service.Delete(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ApiResponse{
+			Success: false,
+			Message: "Internal server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ApiResponse{
+		Success: true,
+		Message: message,
+	})
 }
 
 // Get implements [NoteController].
@@ -79,12 +92,43 @@ func (p productcontroller) Get(c *gin.Context) {
 
 }
 
-// GetById implements [NoteController].
-func (p productcontroller) GetById(c *gin.Context) {
-	panic("unimplemented")
-}
 
 // Update implements [NoteController].
 func (p productcontroller) Update(c *gin.Context) {
-	panic("unimplemented")
+
+	id := c.Param("id")
+
+	var product models.ProductRequest
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ApiResponse{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	pdrt := models.ProductUpdateRequest{
+		ID:          id,
+		Name:        product.Name,
+		Description: product.Description,
+		ImageUrl:    product.ImageUrl,
+		Price:       product.Price,
+	}
+
+	pdata, err := p.service.Update(pdrt)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ApiResponse{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ApiResponse{
+		Success: true,
+		Message: "Product update successfully",
+		Data:    pdata,
+	})
+
 }

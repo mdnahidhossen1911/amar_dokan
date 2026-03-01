@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"amar_dokan/models"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -13,7 +14,7 @@ type productRepository struct {
 type ProductRepository interface {
 	Create(note *models.Product) (*models.Product, error)
 	List(UId string) ([]*models.Product, error)
-	Update(req *models.NoteUpdateRequest) (*models.Product, error)
+	Update(req *models.ProductUpdateRequest) (*models.Product, error)
 	Delete(Id string) (string, error)
 }
 
@@ -35,7 +36,7 @@ func (p productRepository) Create(note *models.Product) (*models.Product, error)
 func (p productRepository) List(UId string) ([]*models.Product, error) {
 	var notes []*models.Product
 
-	if err := p.db.Where("uid = ?", UId).Find(&notes).Error; err != nil {
+	if err := p.db.Where("uid = ? AND is_delete = false", UId).Find(&notes).Error; err != nil {
 		return nil, err
 	}
 	return notes, nil
@@ -43,10 +44,33 @@ func (p productRepository) List(UId string) ([]*models.Product, error) {
 
 // Delete implements [NoteRepository].
 func (p productRepository) Delete(Id string) (string, error) {
-	panic("unimplemented")
+	var product models.Product
+	if err := p.db.Where("id = ?", Id).First(&product).Error; err != nil {
+		return "", fmt.Errorf("product not found")
+	}
+	if err := p.db.Model(product).Where("id = ?", Id).Updates(map[string]interface{}{
+		"is_delete": true,
+	}).Error; err != nil {
+		return "", err
+	}
+	return "Product deleted successfully", nil
 }
 
 // Update implements [NoteRepository].
-func (p productRepository) Update(req *models.NoteUpdateRequest) (*models.Product, error) {
-	panic("unimplemented")
+func (p productRepository) Update(req *models.ProductUpdateRequest) (*models.Product, error) {
+	var product models.Product
+
+	if err := p.db.Model(product).Where("id = ?", req.ID).Updates(map[string]interface{}{
+		"name":        req.Name,
+		"description": req.Description,
+		"image_url":   req.ImageUrl,
+		"price":       req.Price,
+	}).Error; err != nil {
+		return nil, err
+	}
+
+	if err := p.db.Where("id = ?", req.ID).First(&product).Error; err != nil {
+		return nil, fmt.Errorf("product not found")
+	}
+	return &product, nil
 }

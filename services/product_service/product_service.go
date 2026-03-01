@@ -9,8 +9,7 @@ import (
 type ProductService interface {
 	Create(product *models.ProductRequest, token string) (*models.Product, error)
 	Get(token string) ([]*models.Product, error)
-	GetProfile(token string) (*models.Product, error)
-	Update(models.Product) (*models.Product, error)
+	Update(models.ProductUpdateRequest) (*models.Product, error)
 	Delete(id string) (string, error)
 }
 
@@ -35,15 +34,15 @@ func (p productService) Create(product *models.ProductRequest, token string) (*m
 		return nil, err
 	}
 
-	noteData := &models.Product{
-		UID:   payload.Sub,
-		Name: product.Name,
-		Description:  product.Description,
-		ImageUrl: product.ImageUrl,
-		Price: product.Price,
+	productData := &models.Product{
+		UID:         payload.Sub,
+		Name:        product.Name,
+		Description: product.Description,
+		ImageUrl:    product.ImageUrl,
+		Price:       product.Price,
 	}
 
-	return p.repo.Create(noteData)
+	return p.repo.Create(productData)
 
 }
 
@@ -59,15 +58,12 @@ func (p productService) Get(token string) ([]*models.Product, error) {
 
 // Delete implements [NoteService].
 func (p productService) Delete(id string) (string, error) {
-	panic("unimplemented")
-}
-
-// GetProfile implements [NoteService].
-func (p productService) GetProfile(token string) (*models.Product, error) {
-	panic("unimplemented")
+	return p.repo.Delete(id)
 }
 
 // Update implements [NoteService].
-func (p productService) Update(models.Product) (*models.Product, error) {
-	panic("unimplemented")
+func (p productService) Update(req models.ProductUpdateRequest) (*models.Product, error) {
+
+	return p.repo.Update(&req)
+
 }

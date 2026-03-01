@@ -21,7 +21,7 @@ type ProductRequest struct {
 	Price       int    `json:"price" binding:"required"`
 }
 
-type NoteUpdateRequest struct {
+type ProductUpdateRequest struct {
 	ID          string `json:"id" binding:"required"`
 	ImageUrl    string `json:"image"`
 	Name        string `json:"name"`
