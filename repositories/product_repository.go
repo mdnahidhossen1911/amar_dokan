@@ -13,7 +13,7 @@ type productRepository struct {
 
 type ProductRepository interface {
 	Create(note *models.Product) (*models.Product, error)
-	List(UId string) ([]*models.Product, error)
+	List() ([]*models.Product, error)
 	Update(req *models.ProductUpdateRequest) (*models.Product, error)
 	Delete(Id string) (string, error)
 }
@@ -32,11 +32,10 @@ func (p productRepository) Create(note *models.Product) (*models.Product, error)
 
 }
 
-// List implements [NoteRepository].
-func (p productRepository) List(UId string) ([]*models.Product, error) {
+func (p productRepository) List() ([]*models.Product, error) {
 	var notes []*models.Product
 
-	if err := p.db.Where("uid = ? AND is_delete = false", UId).Find(&notes).Error; err != nil {
+	if err := p.db.Where("is_delete = false").Find(&notes).Error; err != nil {
 		return nil, err
 	}
 	return notes, nil

@@ -8,7 +8,7 @@ import (
 
 type ProductService interface {
 	Create(product *models.ProductRequest, token string) (*models.Product, error)
-	Get(token string) ([]*models.Product, error)
+	Get() ([]*models.Product, error)
 	Update(models.ProductUpdateRequest) (*models.Product, error)
 	Delete(id string) (string, error)
 }
@@ -25,7 +25,6 @@ func NewProductService(key string, repo repositories.ProductRepository) ProductS
 	}
 }
 
-// Create implements [NoteService].
 func (p productService) Create(product *models.ProductRequest, token string) (*models.Product, error) {
 
 	payload, err := utils.DecodeJWT(token, p.jwtSecret)
@@ -46,22 +45,15 @@ func (p productService) Create(product *models.ProductRequest, token string) (*m
 
 }
 
-func (p productService) Get(token string) ([]*models.Product, error) {
+func (p productService) Get() ([]*models.Product, error) {
 
-	payload, err := utils.DecodeJWT(token, p.jwtSecret)
-	if err != nil {
-		return nil, err
-	}
-
-	return p.repo.List(payload.Sub)
+	return p.repo.List()
 }
 
-// Delete implements [NoteService].
 func (p productService) Delete(id string) (string, error) {
 	return p.repo.Delete(id)
 }
 
-// Update implements [NoteService].
 func (p productService) Update(req models.ProductUpdateRequest) (*models.Product, error) {
 
 	return p.repo.Update(&req)

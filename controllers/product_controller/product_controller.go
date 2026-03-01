@@ -75,9 +75,7 @@ func (p productcontroller) Delete(c *gin.Context) {
 
 // Get implements [NoteController].
 func (p productcontroller) Get(c *gin.Context) {
-	token := utils.GetTokenFromHeader(c)
-
-	notes, err := p.service.Get(token)
+	notes, err := p.service.Get()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ApiResponse{
 			Success: false,
@@ -91,7 +89,6 @@ func (p productcontroller) Get(c *gin.Context) {
 	})
 
 }
-
 
 // Update implements [NoteController].
 func (p productcontroller) Update(c *gin.Context) {
