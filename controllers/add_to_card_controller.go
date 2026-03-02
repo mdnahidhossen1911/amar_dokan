@@ -13,7 +13,6 @@ type AddToCardController interface {
 	Create(c *gin.Context)
 	Get(c *gin.Context)
 	Update(c *gin.Context)
-	Delete(c *gin.Context)
 }
 
 type addToCardController struct {
@@ -53,12 +52,6 @@ func (a *addToCardController) Create(c *gin.Context) {
 	})
 }
 
-// Delete implements [AddToCardController].
-func (a *addToCardController) Delete(c *gin.Context) {
-	panic("unimplemented")
-}
-
-// Get implements [AddToCardController].
 func (a *addToCardController) Get(c *gin.Context) {
 	token := utils.GetTokenFromHeader(c)
 	addToCarts, err := a.service.Get(token)
@@ -75,7 +68,41 @@ func (a *addToCardController) Get(c *gin.Context) {
 	})
 }
 
-// Update implements [AddToCardController].
 func (a *addToCardController) Update(c *gin.Context) {
-	panic("unimplemented")
+
+	id := c.Param("id")
+
+	token := utils.GetTokenFromHeader(c)
+
+	var req models.AddToCartQuantityRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.ApiResponse{
+			Success: false,
+			Message: "Invalid payload, 'quantity' is requird",
+		})
+		return
+	}
+
+	data := models.AddToCartUpdateRequest{
+		ID:       id,
+		Quantity: req.Quantity,
+	}
+
+	atc, err := a.service.Update(&data, token)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ApiResponse{
+			Success: false,
+			Message: "Not Found this card",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ApiResponse{
+		Success: true,
+		Message: "quantity Update Successfully",
+		Data:    atc,
+	})
+
 }

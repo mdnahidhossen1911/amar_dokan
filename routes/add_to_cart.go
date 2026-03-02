@@ -14,7 +14,5 @@ func RegisterAddToCartRoutes(router *gin.RouterGroup, controller controllers.Add
 
 	grp.POST("/", controller.Create)
 	grp.GET("/", controller.Get)
-	grp.PUT("/", controller.Update)
-	grp.DELETE("/", controller.Delete)
-
+	grp.PUT("/:id", controller.Update)
 }

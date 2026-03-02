@@ -12,8 +12,12 @@ type AddToCartRequest struct {
 	ProductID string `json:"product_id" binding:"required"`
 }
 
+type AddToCartQuantityRequest struct {
+	Quantity int `json:"quantity" binding:"required"`
+}
+
 type AddToCartUpdateRequest struct {
-	ID        string `json:"id" binding:"required"`
-	ProductID string `json:"product_id" binding:"required"`
-	Quantity  int    `json:"quantity" binding:"required"`
+	ID       string `json:"id" binding:"required"`
+	UserID   string `json:"user_id"`
+	Quantity int    `json:"quantity" binding:"required"`
 }

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"amar_dokan/models"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -62,5 +63,19 @@ func (a *addToCartRepository) Get(uid string) ([]*models.AddToCart, error) {
 
 // Update implements [AddToCartRepository].
 func (a *addToCartRepository) Update(addToCart *models.AddToCartUpdateRequest) (*models.AddToCart, error) {
-	panic("unimplemented")
+
+	var existing models.AddToCart
+
+	error := a.db.Model(existing).Where("id = ? And user_id = ?", addToCart.ID, addToCart.UserID).First(&existing).Error
+	if error != nil {
+		return nil, fmt.Errorf("not found")
+	}
+
+	existing.Quantity = addToCart.Quantity
+	if err := a.db.Save(&existing).Error; err != nil {
+		return nil, err
+	}
+
+	return &existing, nil
+
 }
