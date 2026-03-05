@@ -12,9 +12,9 @@ type Category struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
-type CategoryUpdateRequest struct {
-	ID       string `json:"id" binding:"required"`
-	UID      string `json:"uid"     binding:"required"`
+type CategoryRequest struct {
+	ID       string `json:"id"`
+	UID      string `json:"uid"`
 	ImageUrl string `json:"image_url"`
 	Name     string `json:"name"`
 	IsDelete bool   `json:"is_delete"`
