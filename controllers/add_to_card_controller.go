@@ -13,6 +13,7 @@ type AddToCardController interface {
 	Create(c *gin.Context)
 	Get(c *gin.Context)
 	Update(c *gin.Context)
+	Delete(c *gin.Context)
 }
 
 type addToCardController struct {
@@ -105,4 +106,27 @@ func (a *addToCardController) Update(c *gin.Context) {
 		Data:    atc,
 	})
 
+}
+
+// Delete implements [AddToCardController].
+func (a *addToCardController) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	token := utils.GetTokenFromHeader(c)
+
+	res, erro := a.service.Delete(id, token)
+
+	if erro != nil {
+		c.JSON(
+			http.StatusNotFound, utils.ApiResponse{
+				Success: false,
+				Message: erro.Error(),
+			})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ApiResponse{
+		Success: true,
+		Message: res,
+	})
 }

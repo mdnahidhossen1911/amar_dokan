@@ -11,6 +11,7 @@ type AddToCardService interface {
 	Create(addToCard *models.AddToCartRequest, token string) (*models.AddToCart, error)
 	Get(token string) ([]*models.AddToCart, error)
 	Update(addToCard *models.AddToCartUpdateRequest, token string) (*models.AddToCart, error)
+	Delete(id string, token string) (string, error)
 }
 
 type addToCardService struct {
@@ -59,4 +60,21 @@ func (a *addToCardService) Update(addToCard *models.AddToCartUpdateRequest, toke
 	fmt.Println(addToCard.UserID)
 
 	return a.repo.Update(addToCard)
+}
+
+// Delete implements [AddToCardService].
+func (a *addToCardService) Delete(id string, token string) (string, error) {
+
+	payload, err := utils.DecodeJWT(token, a.secureKey)
+	if err != nil {
+		return "", fmt.Errorf("Internal server error")
+	}
+
+
+	cart := &models.AddToCartUpdateRequest{
+		ID:     id,
+		UserID: payload.Sub,
+	}
+
+	return a.repo.Delete(cart)
 }

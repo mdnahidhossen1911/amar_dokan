@@ -45,16 +45,11 @@ func (a *addToCartRepository) Create(addToCart *models.AddToCart) (*models.AddTo
 	return addToCart, nil
 }
 
-// Delete implements [AddToCartRepository].
-func (a *addToCartRepository) Delete(addToCart *models.AddToCartUpdateRequest) (string, error) {
-	panic("unimplemented")
-}
-
 // Get implements [AddToCartRepository].
 func (a *addToCartRepository) Get(uid string) ([]*models.AddToCart, error) {
 	var addToCarts []*models.AddToCart
 
-	err := a.db.Preload("Product").Where("user_id = ?", uid).Find(&addToCarts).Error
+	err := a.db.Preload("Product").Where("user_id = ? And is_delete = false", uid).Find(&addToCarts).Error
 	if err != nil {
 		return nil, err
 	}
@@ -78,4 +73,25 @@ func (a *addToCartRepository) Update(addToCart *models.AddToCartUpdateRequest) (
 
 	return &existing, nil
 
+}
+
+// Delete implements [AddToCartRepository].
+func (a *addToCartRepository) Delete(addToCart *models.AddToCartUpdateRequest) (string, error) {
+
+	var cart models.AddToCart
+
+	result := a.db.
+		Model(&cart).
+		Where("id = ? AND is_delete = ?", addToCart.ID, false).
+		Update("is_delete", true)
+
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return "", fmt.Errorf("no cart found with id %s", addToCart.ID)
+	}
+
+	return fmt.Sprintf("Cart %s deleted successfully", addToCart.ID), nil
 }
