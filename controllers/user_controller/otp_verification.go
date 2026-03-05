@@ -20,41 +20,10 @@ func (ctrl *userController) OtpVerification(c *gin.Context) {
 
 	token, err := ctrl.service.OtpVerification(&req)
 	if err != nil {
-
-		switch err {
-		case models.ErrOTPInvalid:
-			c.JSON(http.StatusBadRequest,
-				utils.ApiResponse{
-					Success: false,
-					Message: err.Error(),
-				})
-			return
-
-		case models.ErrInvalidID:
-			c.JSON(http.StatusBadRequest,
-				utils.ApiResponse{
-					Success: false,
-					Message: err.Error(),
-				})
-			return
-
-		case models.ErrOTPExpired:
-			c.JSON(http.StatusBadRequest,
-				utils.ApiResponse{
-					Success: false,
-					Message: err.Error(),
-				})
-			return
-
-		default:
-			c.JSON(http.StatusBadRequest,
-				utils.ApiResponse{
-					Success: false,
-					Message: "Internal server error",
-				})
-			return
-		}
+		c.JSON(utils.ErrorResponce(err))
+		return
 	}
+
 	c.JSON(http.StatusOK, utils.ApiResponse{
 		Success: true,
 		Message: "Otp Verification Successful",

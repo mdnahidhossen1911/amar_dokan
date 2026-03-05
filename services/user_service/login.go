@@ -1,6 +1,7 @@
 package userService
 
 import (
+	appErr "amar_dokan/app_error"
 	"amar_dokan/models"
 	"amar_dokan/utils"
 )
@@ -8,11 +9,11 @@ import (
 func (s *userService) Login(req *models.LoginRequest) (*models.TokenResponse, error) {
 	u, err := s.repo.FindByEmail(req.Email)
 	if err != nil {
-		return nil, models.ErrUserNotFound
+		return nil, appErr.ErrUserNotFound
 	}
 
 	if !utils.CheckPassword(req.Password, u.Password) {
-		return nil, models.ErrInvalidPassword
+		return nil, appErr.ErrInvalidPassword
 	}
 
 	token, _ := utils.GenerateJWT(u, utils.AccessToken, s.jwtSecret, s.jwtExpiryDays)

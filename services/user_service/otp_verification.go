@@ -1,6 +1,7 @@
 package userService
 
 import (
+	appErr "amar_dokan/app_error"
 	"amar_dokan/models"
 	"amar_dokan/utils"
 	"time"
@@ -9,17 +10,17 @@ import (
 // OtpVerification implements [UserService].
 func (s *userService) OtpVerification(req *models.OtpVerifyRequest) (string, error) {
 	if len(req.Otp) != 6 {
-		return "", models.ErrOTPInvalid
+		return "", appErr.ErrOTPInvalid
 	}
 
 	tuser, err := s.repo.PandingUserFindById(req.Uid)
 
 	if err != nil {
-		return "", models.ErrInvalidID
+		return "", appErr.ErrInvalidID
 	}
 
 	if req.Otp != tuser.Otp {
-		return "", models.ErrOTPInvalid
+		return "", appErr.ErrOTPInvalid
 	}
 
 	u := &models.User{
@@ -31,7 +32,7 @@ func (s *userService) OtpVerification(req *models.OtpVerifyRequest) (string, err
 
 	isValid := time.Since(tuser.CreatedAt).Seconds() <= 120
 	if !isValid {
-		return "", models.ErrOTPExpired
+		return "", appErr.ErrOTPExpired
 	}
 
 	user, err := s.repo.Create(u)

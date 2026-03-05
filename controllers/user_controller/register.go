@@ -30,22 +30,8 @@ func (ctrl *userController) Register(c *gin.Context) {
 
 	user, err := ctrl.service.Register(&req)
 	if err != nil {
-
-		switch err {
-		case models.ErrEmailExists:
-			c.JSON(http.StatusConflict, utils.ApiResponse{
-				Success: false,
-				Message: err.Error(),
-			})
-			return
-
-		default:
-			c.JSON(http.StatusInternalServerError, utils.ApiResponse{
-				Success: false,
-				Message: "Internal server error",
-			})
-			return
-		}
+		c.JSON(utils.ErrorResponce(err))
+		return
 	}
 
 	c.JSON(http.StatusCreated, utils.ApiResponse{

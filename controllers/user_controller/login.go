@@ -20,17 +20,7 @@ func (ctrl *userController) Login(c *gin.Context) {
 
 	token, err := ctrl.service.Login(&req)
 	if err != nil {
-		if err == models.ErrUserNotFound || err == models.ErrInvalidPassword {
-			c.JSON(http.StatusUnauthorized, utils.ApiResponse{
-				Success: false,
-				Message: "Invalid credentials",
-			})
-			return
-		}
-		c.JSON(http.StatusInternalServerError, utils.ApiResponse{
-			Success: false,
-			Message: err.Error(),
-		})
+		c.JSON(utils.ErrorResponce(err))
 		return
 	}
 

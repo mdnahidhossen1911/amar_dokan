@@ -6,7 +6,7 @@ import (
 )
 
 type CategoryService interface {
-	Create(req *models.Category) (*models.Category, error)
+	Create(req *models.CategoryRequest) (*models.Category, error)
 }
 
 type categoryService struct {
@@ -23,6 +23,6 @@ func NewCategoryService(repo *repositories.CategoryRepo, secureKey string) Categ
 }
 
 // Create implements [CategoryService].
-func (c categoryService) Create(req *models.Category) (*models.Category, error) {
+func (c categoryService) Create(req *models.CategoryRequest) (*models.Category, error) {
 	panic("unimplemented")
 }

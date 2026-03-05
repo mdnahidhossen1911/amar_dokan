@@ -4,6 +4,7 @@ import (
 	"amar_dokan/models"
 	"amar_dokan/services"
 	"amar_dokan/utils"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,17 +19,14 @@ type categoryController struct {
 }
 
 func NewCategoryController(service services.CategoryService) CategoryController {
-	return categoryController{service: service}
+	return &categoryController{service: service}
 }
 
 // Create implements [CategoryController].
-func (categoryController) Create(c *gin.Context) {
+func (ctr *categoryController) Create(c *gin.Context) {
 	var req models.CategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest,
-			utils.ApiResponse{
-				Success: false,
-				Message: "Invalid Payload"})
+		c.JSON(utils.ErrorResponce(errors.ErrUnsupported))
 		return
 	}
 
@@ -48,6 +46,22 @@ func (categoryController) Create(c *gin.Context) {
 		return
 	}
 
-	
+	data, erro := ctr.service.Create(&req)
+
+	if erro != nil {
+		c.JSON(http.StatusInternalServerError, utils.ApiResponse{
+			Success: false,
+			Message: "Internal server erro",
+		})
+	}
+
+	c.JSON(
+		http.StatusOK,
+		utils.ApiResponse{
+			Success: true,
+			Message: "Create Successful",
+			Data:    data,
+		},
+	)
 
 }

@@ -1,6 +1,7 @@
 package userService
 
 import (
+	appErr "amar_dokan/app_error"
 	"amar_dokan/models"
 	"amar_dokan/utils"
 )
@@ -9,7 +10,7 @@ func (s *userService) Register(req *models.CreateUserRequest) (*models.RegisterR
 
 	findEmail, err := s.repo.FindByEmail(req.Email)
 	if findEmail != nil {
-		return nil, models.ErrEmailExists
+		return nil, appErr.ErrEmailExists
 	}
 
 	otp, err := utils.GenerateOTP(6)
