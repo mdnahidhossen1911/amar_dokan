@@ -17,6 +17,4 @@ func registerCategory(router *gin.RouterGroup, controller controllers.CategoryCo
 	grp.POST("/", controller.Create)
 	// grp.PUT("/:id", controller.Update)
 	// grp.DELETE("/:id", controller.Delete)
-	//	productGr := rg.Group("/products")
-
 }

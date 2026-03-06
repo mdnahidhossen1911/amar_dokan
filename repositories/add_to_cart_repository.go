@@ -82,7 +82,7 @@ func (a *addToCartRepository) Delete(addToCart *models.AddToCartUpdateRequest) (
 
 	result := a.db.
 		Model(&cart).
-		Where("id = ? AND is_delete = ?", addToCart.ID, false).
+		Where("id = ? AND user_id = ?", addToCart.ID, addToCart.UserID).
 		Update("is_delete", true)
 
 	if result.Error != nil {
