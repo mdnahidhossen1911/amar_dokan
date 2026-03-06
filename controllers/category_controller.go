@@ -12,6 +12,7 @@ import (
 
 type CategoryController interface {
 	Create(c *gin.Context)
+	Get(c *gin.Context)
 }
 
 type categoryController struct {
@@ -24,6 +25,9 @@ func NewCategoryController(service services.CategoryService) CategoryController 
 
 // Create implements [CategoryController].
 func (ctr *categoryController) Create(c *gin.Context) {
+
+	token := utils.GetTokenFromHeader(c)
+
 	var req models.CategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(utils.ErrorResponce(errors.ErrUnsupported))
@@ -46,22 +50,36 @@ func (ctr *categoryController) Create(c *gin.Context) {
 		return
 	}
 
-	data, erro := ctr.service.Create(&req)
+	data, erro := ctr.service.Create(&req, token)
 
 	if erro != nil {
-		c.JSON(http.StatusInternalServerError, utils.ApiResponse{
-			Success: false,
-			Message: "Internal server erro",
-		})
+		c.JSON(utils.ErrorResponce(erro))
+		return
 	}
 
 	c.JSON(
-		http.StatusOK,
+		http.StatusCreated,
 		utils.ApiResponse{
 			Success: true,
-			Message: "Create Successful",
+			Message: "Category create Successful",
 			Data:    data,
 		},
 	)
+
+}
+
+func (ctr *categoryController) Get(c *gin.Context) {
+
+	data, err := ctr.service.Get()
+
+	if err != nil {
+		c.JSON(utils.ErrorResponce(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ApiResponse{
+		Success: true,
+		Data:    data,
+	})
 
 }
