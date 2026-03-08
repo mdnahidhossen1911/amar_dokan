@@ -8,6 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Login godoc
+// @Summary Login user
+// @Description authenticate user and get token
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param login body models.LoginRequest true "Login Credentials"
+// @Success 200 {object} utils.ApiResponse "Login Successful"
+// @Router /api/v1/users/login [post]
 func (ctrl *userController) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

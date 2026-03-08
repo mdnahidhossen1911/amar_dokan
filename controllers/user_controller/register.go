@@ -9,6 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Register godoc
+// @Summary Create new user
+// @Description create user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body models.CreateUserRequest true "User Data"
+// @Success 201 {object} utils.ApiResponse "Account created. OTP has been sent to your email."
+// @Router /api/v1/users [post]
 func (ctrl *userController) Register(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
