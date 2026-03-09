@@ -12,7 +12,11 @@ import (
 	userService "amar_dokan/services/user_service"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
+
+	_ "amar_dokan/docs"
 )
 
 func SetupRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
@@ -36,7 +40,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 
 	// Global middleware
 	r.Use(middleware.CORS())
-	r.Use(middleware.RateLimiter())
+	// r.Use(middleware.RateLimiter())
 	r.Use(gin.Recovery())
 
 	// Health check
@@ -50,6 +54,7 @@ func SetupRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 
 	// ── API v1 ───────────────────────────────────────────────────────────
 	apiV1 := r.Group("/api/v1")
+	apiV1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	registerUserRoutes(apiV1, userCtrl, userRepo, cfg.JwtSecureKey)
 	registerProductRoutes(apiV1, productCtrl, userRepo, cfg.JwtSecureKey)
