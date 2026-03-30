@@ -13,6 +13,7 @@ import (
 type CategoryController interface {
 	Create(c *gin.Context)
 	Get(c *gin.Context)
+	Delete(c *gin.Context)
 }
 
 type categoryController struct {
@@ -82,4 +83,22 @@ func (ctr *categoryController) Get(c *gin.Context) {
 		Data:    data,
 	})
 
+}
+
+// Delete implements [CategoryController].
+func (ctr *categoryController) Delete(c *gin.Context) {
+
+	id := c.Param("id")
+	token := utils.GetTokenFromHeader(c)
+
+	res, err := ctr.service.Delete(id, token)
+	if err != nil{
+		c.JSON(utils.ErrorResponce(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ApiResponse{
+		Success: true,
+		Message: res,
+	})
 }

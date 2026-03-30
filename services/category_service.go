@@ -10,6 +10,7 @@ import (
 type CategoryService interface {
 	Create(req *models.CategoryRequest, token string) (*models.Category, error)
 	Get() ([]*models.Category, error)
+	Delete(cID string, token string) (string, error)
 }
 
 type categoryService struct {
@@ -46,7 +47,16 @@ func (c categoryService) Create(req *models.CategoryRequest, token string) (*mod
 	return res, nil
 }
 
-// Get implements [CategoryService].
 func (c categoryService) Get() ([]*models.Category, error) {
 	return c.repo.List()
+}
+
+func (c categoryService) Delete(cID string, token string) (string, error) {
+
+	payload, err := utils.DecodeJWT(token, c.SecureKey)
+	if err != nil {
+		return "", appErr.ErrInternalServer
+	}
+
+	return c.repo.Delete(cID, payload.Sub)
 }
