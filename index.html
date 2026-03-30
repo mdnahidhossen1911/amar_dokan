@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amar Dokan API Console</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            /* OLED Dark Mode */
+            --bg-main: #000000;
+            --bg-sidebar: #080808;
+            --bg-card: #000000;
+            --border-color: #1f1f1f;
+            --text-main: #999999;
+            --text-bright: #ffffff;
+            --accent: #2f81f7;
+            --success: #3fb950;
+            --error: #f85149;
+            --warning: #d29922;
+            --folder-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        [data-theme="light"] {
+            /* Professional Light Mode */
+            --bg-main: #ffffff;
+            --bg-sidebar: #f6f8fa;
+            --bg-card: #ffffff;
+            --border-color: #d0d7de;
+            --text-main: #57606a;
+            --text-bright: #1f2328;
+            --accent: #0969da;
+            --folder-bg: #ebf0f4;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background 0.15s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar & Folders */
+        .sidebar {
+            width: 320px;
+            min-width: 320px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .folder-group {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .folder-header {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            background: var(--folder-bg);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .folder-content {
+            display: none;
+            background: var(--bg-main);
+        }
+
+        .folder-group.open .folder-content {
+            display: block;
+        }
+
+        .folder-group.open .folder-icon {
+            transform: rotate(90deg);
+        }
+
+        .endpoint-item {
+            padding: 10px 20px 10px 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono';
+            font-size: 11px;
+            border-left: 3px solid transparent;
+        }
+
+        .endpoint-item.selected {
+            background: rgba(47, 129, 247, 0.1);
+            border-left-color: var(--accent);
+            color: var(--text-bright);
+        }
+
+        .method-tag {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 4px;
+            min-width: 48px;
+            text-align: center;
+            border: 1px solid currentColor;
+        }
+
+        /* Workspace */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .address-bar {
+            padding: 15px 20px;
+            display: flex;
+            gap: 12px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .url-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-bright);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono';
+            font-size: 13px;
+            outline: none;
+        }
+
+        .btn-run {
+            background: var(--accent);
+            color: #fff !important;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        /* Tabs & Panels */
+        .nav-tabs {
+            display: flex;
+            background: var(--bg-sidebar);
+            padding: 0 20px;
+            gap: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-link {
+            padding: 14px 0;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            position: relative;
+            text-transform: uppercase;
+        }
+
+        .nav-link.active {
+            color: var(--text-bright);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 15px;
+            background: var(--bg-main);
+        }
+
+        .editor {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--success);
+            font-family: 'JetBrains Mono';
+            padding: 15px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        /* Response */
+        .response-container {
+            height: 40%;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-sidebar);
+        }
+
+        .response-toolbar {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .response-viewer {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            color: var(--text-bright);
+            background: var(--bg-main);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="dynamicSidebarTitle"
+                    style="font-weight:800; color:var(--text-bright); font-size:12px; letter-spacing:1px;">LOADING...</span>
+                <i class='bx bx-moon' style="cursor:pointer; font-size: 18px; color: var(--text-bright);"
+                    onclick="toggleTheme()" id="themeToggle"></i>
+            </div>
+            <div id="dynamicApiVersion"
+                style="margin-top:10px; background:var(--accent); color:white; padding:2px 8px; font-size:9px; border-radius:4px; display:inline-block;">
+                v0.0.0</div>
+        </div>
+        <div id="sidebar-list" style="flex:1; overflow-y:auto;"></div>
+    </aside>
+
+    <main class="workspace">
+        <div class="address-bar">
+            <select id="methodSelect" class="url-input"
+                style="flex:0; width:100px; color:var(--warning); font-weight:800;">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>DELETE</option>
+            </select>
+            <input type="text" id="urlInput" class="url-input" placeholder="Select an API...">
+            <button class="btn-run" onclick="sendRequest()"><i class='bx bx-play'></i> RUN</button>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-link active" onclick="switchTab(0)">Body</div>
+            <div class="nav-link" onclick="switchTab(1)">Auth</div>
+            <div class="nav-link" onclick="switchTab(2)">Docs</div>
+        </div>
+
+        <div class="tab-content">
+            <div id="panel-0" style="display:block; height:100%"><textarea id="bodyEditor" class="editor"
+                    spellcheck="false">{}</textarea></div>
+            <div id="panel-1" style="display:none; padding:10px">
+                <input type="text" id="bearerToken" class="url-input" style="width:100%" placeholder="Bearer Token">
+            </div>
+            <div id="panel-2" style="display:none; padding:10px; font-size:13px;" id="endpointDescription">Select an API
+                to see documentation.</div>
+        </div>
+
+        <section class="response-container">
+            <div class="response-toolbar">
+                <div style="font-size:11px; font-family:'JetBrains Mono'">
+                    <span id="statusCode" style="font-weight:800">READY</span> | <span id="resTime"
+                        style="color:var(--success)">0ms</span>
+                </div>
+                <button
+                    style="background:var(--bg-card); border:1px solid var(--border-color); color:var(--text-main); padding:4px 10px; border-radius:4px; font-size:11px; cursor:pointer;"
+                    onclick="copyResponse()">Copy</button>
+            </div>
+            <div class="response-viewer" id="responseBody">// Execution result...</div>
+        </section>
+    </main>
+
+    <script>
+        let currentSpec = null;
+        let selectedElement = null;
+
+        function toggleTheme() {
+            const b = document.body;
+            const isDark = b.getAttribute('data-theme') === 'dark';
+            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeToggle').className = isDark ? 'bx bx-sun' : 'bx bx-moon';
+        }
+
+        async function loadSwagger() {
+            try {
+                const res = await fetch('http://localhost:8000/api/v1/docs/doc.json');
+                currentSpec = await res.json();
+
+                // Fix Title and Version
+                document.getElementById('dynamicSidebarTitle').textContent = (currentSpec.info.title || "API").toUpperCase();
+                document.getElementById('dynamicApiVersion').textContent = "v" + (currentSpec.info.version || "1.0");
+
+                renderSidebarFolders();
+            } catch (err) {
+                document.getElementById('sidebar-list').innerHTML = `<div style="padding:20px; font-size:11px; color:var(--error)">Check CORS or Localhost Connection.</div>`;
+            }
+        }
+
+        function renderSidebarFolders() {
+            const container = document.getElementById('sidebar-list');
+            container.innerHTML = '';
+            const groups = {};
+
+            Object.keys(currentSpec.paths).forEach(path => {
+                const parts = path.split('/').filter(p => p);
+                let groupName = 'GENERAL';
+                if (parts.length > 0) {
+                    let idx = parts[0].toLowerCase() === 'api' ? 1 : 0;
+                    if (parts[idx] && /^v\d+$/i.test(parts[idx])) idx++;
+                    groupName = parts[idx] ? parts[idx].toUpperCase() : 'GENERAL';
+                }
+                if (!groups[groupName]) groups[groupName] = [];
+                Object.keys(currentSpec.paths[path]).forEach(method => groups[groupName].push({ path, method }));
+            });
+
+            Object.keys(groups).sort().forEach(groupName => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'folder-group';
+                groupDiv.innerHTML = `
+                    <div class="folder-header" onclick="this.parentElement.classList.toggle('open')">
+                        <span><i class='bx bxs-folder' style="margin-right:8px; color:var(--accent)"></i> ${groupName}</span>
+                        <i class='bx bx-chevron-right folder-icon'></i>
+                    </div>
+                    <div class="folder-content"></div>
+                `;
+                const contentDiv = groupDiv.querySelector('.folder-content');
+                groups[groupName].forEach(api => {
+                    const item = document.createElement('div');
+                    item.className = 'endpoint-item';
+                    const color = api.method === 'get' ? 'var(--success)' : api.method === 'post' ? 'var(--warning)' : 'var(--error)';
+                    item.innerHTML = `<span class="method-tag" style="color:${color}">${api.method.toUpperCase()}</span><span>${api.path}</span>`;
+                    item.onclick = (e) => { e.stopPropagation(); selectEndpoint(item, api.path, api.method); };
+                    contentDiv.appendChild(item);
+                });
+                container.appendChild(groupDiv);
+            });
+        }
+
+        function selectEndpoint(el, path, method) {
+            if (selectedElement) selectedElement.classList.remove('selected');
+            el.classList.add('selected'); selectedElement = el;
+
+            document.getElementById('urlInput').value = `http://localhost:8000${path}`;
+            document.getElementById('methodSelect').value = method.toUpperCase();
+
+            const endpoint = currentSpec.paths[path][method];
+            document.getElementById('panel-2').textContent = endpoint.summary || "No description.";
+
+            // Fix Body Logic
+            let bodyJSON = {};
+            const bodyParam = (endpoint.parameters || []).find(p => p.in === 'body');
+            if (bodyParam && bodyParam.schema) {
+                bodyJSON = parseSchema(bodyParam.schema);
+            }
+            document.getElementById('bodyEditor').value = JSON.stringify(bodyJSON, null, 2);
+        }
+
+        function parseSchema(schema) {
+            let ref = schema.$ref || (schema.items && schema.items.$ref);
+            if (ref) {
+                const refKey = ref.replace('#/definitions/', '');
+                const definition = currentSpec.definitions[refKey];
+                if (!definition) return {};
+
+                let obj = {};
+                if (definition.properties) {
+                    Object.keys(definition.properties).forEach(key => {
+                        const prop = definition.properties[key];
+                        if (prop.$ref) obj[key] = parseSchema(prop);
+                        else if (prop.type === 'string') obj[key] = "";
+                        else if (prop.type === 'boolean') obj[key] = false;
+                        else if (prop.type === 'integer' || prop.type === 'number') obj[key] = 0;
+                        else if (prop.type === 'array') obj[key] = [];
+                        else obj[key] = null;
+                    });
+                }
+                return obj;
+            }
+            return {};
+        }
+
+        async function sendRequest() {
+            const url = document.getElementById('urlInput').value;
+            const method = document.getElementById('methodSelect').value;
+            const body = document.getElementById('bodyEditor').value;
+            const token = document.getElementById('bearerToken').value;
+            const viewer = document.getElementById('responseBody');
+            viewer.textContent = "// Loading...";
+            const start = performance.now();
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const options = { method, headers };
+                if (method !== 'GET') options.body = body;
+                const res = await fetch(url, options);
+                const data = await res.json();
+                document.getElementById('statusCode').textContent = res.status;
+                document.getElementById('resTime').textContent = Math.round(performance.now() - start) + "ms";
+                viewer.textContent = JSON.stringify(data, null, 2);
+            } catch (err) { viewer.textContent = "Error: " + err.message; }
+        }
+
+        function switchTab(n) {
+            [0, 1, 2].forEach(i => {
+                document.getElementById(`panel-${i}`).style.display = i === n ? 'block' : 'none';
+                document.querySelectorAll('.nav-link')[i].classList.toggle('active', i === n);
+            });
+        }
+
+        function copyResponse() { navigator.clipboard.writeText(document.getElementById('responseBody').textContent); }
+        window.onload = loadSwagger;
+    </script>
+</body>
+
+</html>

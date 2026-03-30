@@ -52,6 +52,10 @@ func SetupRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 		})
 	})
 
+	r.GET("/docs", func(c *gin.Context) {
+		c.File("index.html")
+	})
+
 	// ── API v1 ───────────────────────────────────────────────────────────
 	apiV1 := r.Group("/api/v1")
 	apiV1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
