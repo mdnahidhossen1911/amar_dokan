@@ -17,7 +17,9 @@ import (
 // @Produce json
 // @Param user body models.CreateUserRequest true "User Data"
 // @Success 201 {object} utils.ApiResponse "Account created. OTP has been sent to your email."
-// @Router /api/v1/users [post]
+// @Failure 400 {object} utils.ApiResponse "Invalid request payload"
+// @Failure 500 {object} utils.ApiResponse "Internal server error"
+// @Router /users [post]
 func (ctrl *userController) Register(c *gin.Context) {
 	var req models.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

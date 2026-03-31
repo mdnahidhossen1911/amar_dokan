@@ -4,9 +4,12 @@ import "amar_dokan/cmd"
 
 // @title Amar Dokan API
 // @version 1.0
-// @description This is a sample server for Gin API.
+// @description API documentation for Amar Dokan.
 // @host localhost:8000
-// @BasePath 
+// @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 	cmd.Serve()

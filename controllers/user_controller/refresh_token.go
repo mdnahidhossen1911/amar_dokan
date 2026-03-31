@@ -9,6 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RefrashToken godoc
+// @Summary Refresh access token
+// @Description Generate a new access token using the Authorization bearer token
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param Authorization header string true "Bearer refresh token"
+// @Success 200 {object} utils.ApiResponse "Access Token Genaret Successful"
+// @Failure 401 {object} utils.ApiResponse "Unauthorized"
+// @Failure 500 {object} utils.ApiResponse "Internal server error"
+// @Router /users/refresh-token [get]
 func (ctrl *userController) RefrashToken(c *gin.Context) {
 	header := c.GetHeader("Authorization")
 	if header == "" {

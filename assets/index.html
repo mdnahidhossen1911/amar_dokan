@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Console</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/app.css">
+
+    <link rel="icon" type="image/png" href="/assets/icons/icon.png">
+
+</head>
+
+<body data-theme="dark">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand-row">
+                <div>
+                    <div class="brand-kicker">API Workspace</div>
+                    <h1 id="dynamicSidebarTitle" class="brand-title">Loading...</h1>
+                    <div class="brand-subtitle">Browse endpoints, inspect docs, and run requests from one focused
+                        workspace.</div>
+                </div>
+                <i class='bx bx-moon' style="cursor:pointer; font-size: 18px; color: var(--text-bright);"
+                    onclick="toggleTheme()" id="themeToggle"></i>
+            </div>
+            <div class="sidebar-meta">
+                <div id="dynamicApiVersion" class="version-chip">v0.0.0</div>
+                <div class="meta-chip"><i class='bx bx-layer'></i> Live Spec</div>
+            </div>
+        </div>
+        <div id="sidebar-list" class="sidebar-scroll"></div>
+    </aside>
+
+    <main class="workspace">
+        <div class="address-bar">
+            <select id="methodSelect" class="url-input">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>DELETE</option>
+            </select>
+            <input type="text" id="urlInput" class="url-input" placeholder="Select an API...">
+            <button class="btn-run" onclick="sendRequest()"><i class='bx bx-play'></i> RUN</button>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-link active" onclick="switchTab(0)">Body</div>
+            <div class="nav-link" onclick="switchTab(1)">Auth</div>
+            <div class="nav-link" onclick="switchTab(2)">Params</div>
+            <div class="nav-link" onclick="switchTab(3)">Headers</div>
+            <div class="nav-link" onclick="switchTab(4)">Docs</div>
+        </div>
+
+        <div class="tab-content">
+            <div id="panel-0" style="display:block; height:100%"><textarea id="bodyEditor" class="editor"
+                    spellcheck="false">{}</textarea></div>
+            <div id="panel-1" style="display:none; padding:10px">
+                <div class="stack">
+                    <div class="field-label">Bearer Token</div>
+                    <input type="text" id="bearerToken" class="url-input" style="width:100%" placeholder="Bearer Token">
+                </div>
+            </div>
+            <div id="panel-2" style="display:none; padding:10px; height:100%">
+                <div class="params-panel">
+                    <div class="params-toolbar">
+                        <div>
+                            <span class="params-title">Params</span>
+                            <span class="params-subtitle">query string values</span>
+                        </div>
+                        <div class="params-actions">
+                            <button type="button" class="params-action-btn" onclick="addQueryParamRow()">Add
+                                Param</button>
+                        </div>
+                    </div>
+                    <div class="params-table-wrap">
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th class="param-row-toggle"></th>
+                                    <th class="param-row-actions"></th>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queryParamsTableBody">
+                                <tr class="query-param-row">
+                                    <td class="param-row-toggle"><input class="param-enable" type="checkbox" checked>
+                                    </td>
+                                    <td class="param-row-actions"><button type="button" class="param-remove-btn"
+                                            onclick="removeQueryParamRow(this)" title="Remove row">&times;</button></td>
+                                    <td><input type="text" class="param-key" placeholder="Key"></td>
+                                    <td><input type="text" class="param-value" placeholder="Value"></td>
+                                    <td><input type="text" class="param-desc-input" placeholder="Description"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="params-footnote">Enabled params are appended to the request URL.</div>
+                </div>
+            </div>
+            <div id="panel-3" style="display:none; padding:10px; height:100%">
+                <div class="headers-panel">
+                    <div class="headers-toolbar">
+                        <div>
+                            <span class="headers-title">Headers</span>
+                            <span class="headers-subtitle">custom request headers</span>
+                        </div>
+                        <div class="headers-actions">
+                            <button type="button" class="headers-action-btn" onclick="addHeaderRow()">Add
+                                Header</button>
+                        </div>
+                    </div>
+                    <div class="headers-table-wrap" id="headersTableWrap">
+                        <table class="headers-table">
+                            <thead>
+                                <tr>
+                                    <th class="header-row-toggle"></th>
+                                    <th class="header-row-actions"></th>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="headersTableBody">
+                                <tr class="header-row">
+                                    <td class="header-row-toggle"><input class="header-enable" type="checkbox" checked>
+                                    </td>
+                                    <td class="header-row-actions"><button type="button" class="header-remove-btn"
+                                            onclick="removeHeaderRow(this)" title="Remove row">&times;</button></td>
+                                    <td><input type="text" class="header-key" placeholder="Key"></td>
+                                    <td><input type="text" class="header-value" placeholder="Value"></td>
+                                    <td><input type="text" class="header-desc-input" placeholder="Description"></td>
+                                </tr>
+                                <tr class="header-row">
+                                    <td class="header-row-toggle"><input class="header-enable" type="checkbox"></td>
+                                    <td class="header-row-actions"><button type="button" class="header-remove-btn"
+                                            onclick="removeHeaderRow(this)" title="Remove row">&times;</button></td>
+                                    <td><input type="text" class="header-key" placeholder="Key"></td>
+                                    <td><input type="text" class="header-value" placeholder="Value"></td>
+                                    <td><input type="text" class="header-desc-input" placeholder="Description"></td>
+                                </tr>
+                                <tr class="header-row">
+                                    <td class="header-row-toggle"><input class="header-enable" type="checkbox"></td>
+                                    <td class="header-row-actions"><button type="button" class="header-remove-btn"
+                                            onclick="removeHeaderRow(this)" title="Remove row">&times;</button></td>
+                                    <td><input type="text" class="header-key" placeholder="Key"></td>
+                                    <td><input type="text" class="header-value" placeholder="Value"></td>
+                                    <td><input type="text" class="header-desc-input" placeholder="Description"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="headers-footnote">Enable the rows you want to send with the request.</div>
+                </div>
+            </div>
+            <div id="panel-4" style="display:none; height:100%">
+                <div id="endpointDescription" class="docs-panel">Select an API to see documentation.</div>
+            </div>
+        </div>
+
+        <section class="response-container">
+            <div class="response-toolbar">
+                <div style="font-size:11px; font-family:'JetBrains Mono'">
+                    <span id="statusCode" style="font-weight:800">READY</span> | <span id="resTime"
+                        style="color:var(--success)">0ms</span>
+                </div>
+                <button class="toolbar-btn" onclick="copyResponse()">Copy Response</button>
+            </div>
+            <div class="response-viewer" id="responseBody">// Execution result...</div>
+        </section>
+    </main>
+
+    <script src="/assets/app-config.js"></script>
+    <script src="/assets/app.js"></script>
+</body>
+
+</html>

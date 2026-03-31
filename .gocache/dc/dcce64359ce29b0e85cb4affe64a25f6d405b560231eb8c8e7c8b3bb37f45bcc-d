@@ -1,0 +1,10 @@
+./List.go
+./delete.go
+./get_by_id.go
+./get_profile.go
+./login.go
+./otp_verification.go
+./refresh_token.go
+./register.go
+./update.go
+./user_controller.go

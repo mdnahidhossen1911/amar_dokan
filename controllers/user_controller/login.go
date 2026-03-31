@@ -16,7 +16,9 @@ import (
 // @Produce json
 // @Param login body models.LoginRequest true "Login Credentials"
 // @Success 200 {object} utils.ApiResponse "Login Successful"
-// @Router /api/v1/users/login [post]
+// @Failure 400 {object} utils.ApiResponse "Invalid request payload"
+// @Failure 500 {object} utils.ApiResponse "Internal server error"
+// @Router /users/login [post]
 func (ctrl *userController) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

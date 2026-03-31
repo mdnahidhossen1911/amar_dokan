@@ -52,9 +52,16 @@ func SetupRouter(cfg *config.Config, db *gorm.DB) *gin.Engine {
 		})
 	})
 
-	r.GET("/docs", func(c *gin.Context) {
-		c.File("index.html")
+	r.GET("/", func(c *gin.Context) {
+		c.File("assets/index.html")
 	})
+	r.GET("/docs", func(c *gin.Context) {
+		c.File("assets/index.html")
+	})
+	r.GET("/docs/", func(c *gin.Context) {
+		c.File("assets/index.html")
+	})
+	r.Static("/assets", "./assets")
 
 	// ── API v1 ───────────────────────────────────────────────────────────
 	apiV1 := r.Group("/api/v1")

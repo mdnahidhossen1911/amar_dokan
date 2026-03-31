@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// OtpVerification godoc
+// @Summary Verify OTP
+// @Description Verify a newly registered user's OTP and return an access token
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param payload body models.OtpVerifyRequest true "OTP verification payload"
+// @Success 200 {object} utils.ApiResponse "Otp Verification Successful"
+// @Failure 400 {object} utils.ApiResponse "Invalid request payload"
+// @Failure 500 {object} utils.ApiResponse "Internal server error"
+// @Router /users/verification [post]
 func (ctrl *userController) OtpVerification(c *gin.Context) {
 	var req models.OtpVerifyRequest
 	if error := c.ShouldBindJSON(&req); error != nil {
